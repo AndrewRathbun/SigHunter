@@ -1,0 +1,15 @@
+D:\SigHunter2\SigHunter2\SigHunter\bin\Debug\net6.0\SigHunter.exe
+D:\SigHunter2\SigHunter2\SigHunter\bin\Debug\net6.0\SigHunter.deps.json
+D:\SigHunter2\SigHunter2\SigHunter\bin\Debug\net6.0\SigHunter.runtimeconfig.json
+D:\SigHunter2\SigHunter2\SigHunter\bin\Debug\net6.0\SigHunter.dll
+D:\SigHunter2\SigHunter2\SigHunter\bin\Debug\net6.0\SigHunter.pdb
+D:\SigHunter2\SigHunter2\SigHunter\obj\Debug\net6.0\SigHunter.csproj.AssemblyReference.cache
+D:\SigHunter2\SigHunter2\SigHunter\obj\Debug\net6.0\SigHunter.GeneratedMSBuildEditorConfig.editorconfig
+D:\SigHunter2\SigHunter2\SigHunter\obj\Debug\net6.0\SigHunter.AssemblyInfoInputs.cache
+D:\SigHunter2\SigHunter2\SigHunter\obj\Debug\net6.0\SigHunter.AssemblyInfo.cs
+D:\SigHunter2\SigHunter2\SigHunter\obj\Debug\net6.0\SigHunter.csproj.CoreCompileInputs.cache
+D:\SigHunter2\SigHunter2\SigHunter\obj\Debug\net6.0\SigHunter.dll
+D:\SigHunter2\SigHunter2\SigHunter\obj\Debug\net6.0\refint\SigHunter.dll
+D:\SigHunter2\SigHunter2\SigHunter\obj\Debug\net6.0\SigHunter.pdb
+D:\SigHunter2\SigHunter2\SigHunter\obj\Debug\net6.0\SigHunter.genruntimeconfig.cache
+D:\SigHunter2\SigHunter2\SigHunter\obj\Debug\net6.0\ref\SigHunter.dll

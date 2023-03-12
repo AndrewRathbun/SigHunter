@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\SigHunter2\\SigHunter\\SigHunter\\SigHunter.csproj": {}
+    "D:\\SigHunter2\\SigHunter2\\SigHunter\\SigHunter.csproj": {}
   },
   "projects": {
-    "D:\\SigHunter2\\SigHunter\\SigHunter\\SigHunter.csproj": {
+    "D:\\SigHunter2\\SigHunter2\\SigHunter\\SigHunter.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\SigHunter2\\SigHunter\\SigHunter\\SigHunter.csproj",
+        "projectUniqueName": "D:\\SigHunter2\\SigHunter2\\SigHunter\\SigHunter.csproj",
         "projectName": "SigHunter",
-        "projectPath": "D:\\SigHunter2\\SigHunter\\SigHunter\\SigHunter.csproj",
+        "projectPath": "D:\\SigHunter2\\SigHunter2\\SigHunter\\SigHunter.csproj",
         "packagesPath": "C:\\Users\\CFUser\\.nuget\\packages\\",
-        "outputPath": "D:\\SigHunter2\\SigHunter\\SigHunter\\obj\\",
+        "outputPath": "D:\\SigHunter2\\SigHunter2\\SigHunter\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\CFUser\\AppData\\Roaming\\NuGet\\NuGet.Config"
