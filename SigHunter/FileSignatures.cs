@@ -2,6 +2,12 @@ public static class FileSignatures
 {
     public static Dictionary<string, string> Signatures { get; } = new Dictionary<string, string>
     {
+        // Template to follow when contributing new file extensions
+        // {".ext", "AB-CD-12-34"}, // Example File Extension (EFE)
+        
+        // Please organize your contribution(s) under the appropriate categories
+        // Ideally, maintain alphabetical order as new entries are added to this dictionary
+                
         // Audio files
         {".aac", "FF-F1"}, // Advanced Audio Coding (AAC)
         {".ac3", "0B-77"}, // Audio Codec 3 (AC3)
