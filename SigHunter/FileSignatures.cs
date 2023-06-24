@@ -41,35 +41,36 @@ public static class FileSignatures
         {".vob", "00-00-01-BA"}, // Video Object (VOB)
         {".webm", "1A-45-DF-A3-93-42-82-88-68-74-74-70-73-3A-2F-2F"}, // WebM video
         {".wmv", "30-26-B2-75-8E-66-CF-11"} // Windows Media Video
-
+        
         // Picture files
+        {".bmp", "42-4D"}, // Bitmap image
         {".gif", "47-49-46-38"}, // Graphics Interchange Format (GIF)
+        {".ico", "00-00-01-00"}, // Icon format
         {".jpeg", "FF-D8-FF-E0"}, // JPEG image
         {".jpg", "FF-D8-FF-E0"}, // JPEG image
         {".png", "89-50-4E-47"}, // Portable Network Graphics
-        {".bmp", "42-4D"}, // Bitmap image
-        {".tiff", "49-49-2A-00"}, // Tagged Image File Format (little endian, i.e., Intel byte ordering)
-        {".tiff", "4D-4D-00-2A"}, // Tagged Image File Format (big endian, i.e., Motorola byte ordering)
-        {".ico", "00-00-01-00"}, // Icon format
         {".psd", "38-42-50-53"}, // Adobe Photoshop
         {".svg", "3C-3F-78-6D-6C"}, // Scalable Vector Graphics (SVG) (starts with "<?xml")
+        {".tiff", "49-49-2A-00"}, // Tagged Image File Format (little endian, i.e., Intel byte ordering)
+        {".tiff", "4D-4D-00-2A"}, // Tagged Image File Format (big endian, i.e., Motorola byte ordering)
         {".webp", "52-49-46-46-XX-XX-XX-XX-57-45-42-50"}, // WebP Image (XX's can be any value)
-
+        
         // Document files
         {".doc", "D0-CF-11-E0"}, // Microsoft Word (97-2003)
+        {".docx", "50-4B-03-04"}, // Microsoft Word (OpenXML)
+        {".epub", "50-4B-03-04"}, // EPUB eBook file
+        {".mobi", "BO-OK"}, // MOBI eBook file
+        {".odp", "50-4B-03-04"}, // OpenDocument Presentation
+        {".ods", "50-4B-03-04"}, // OpenDocument Spreadsheet
+        {".odt", "50-4B-03-04"}, // OpenDocument Text
         {".pdf", "25-50-44-46-2D-31-2E"}, // Adobe PDF
         {".ppt", "D0-CF-11-E0"}, // Microsoft PowerPoint (97-2003)
-        {".rtf", "7B-5C-72-74-66-31"}, // Rich Text Format
-        {".xls", "D0-CF-11-E0"}, // Microsoft Excel (97-2003)
-        {".xml", "3C-3F-78-6D"}, // XML document
-        {".docx", "50-4B-03-04"}, // Microsoft Word (OpenXML)
-        {".xlsx", "50-4B-03-04"}, // Microsoft Excel (OpenXML)
         {".pptx", "50-4B-03-04"}, // Microsoft PowerPoint (OpenXML)
-        {".odt", "50-4B-03-04"}, // OpenDocument Text
-        {".ods", "50-4B-03-04"}, // OpenDocument Spreadsheet
-        {".odp", "50-4B-03-04"}, // OpenDocument Presentation
+        {".rtf", "7B-5C-72-74-66-31"}, // Rich Text Format
         {".txt", "EF-BB-BF"}, // Text file (UTF-8 BOM)
-        {".epub", "50-4B-03-04"}, // EPUB eBook file
+        {".xls", "D0-CF-11-E0"}, // Microsoft Excel (97-2003)
+        {".xlsx", "50-4B-03-04"}, // Microsoft Excel (OpenXML)
+        {".xml", "3C-3F-78-6D"}, // XML document
 
         // Archive files
         {".7z", "37-7A-BC-AF-27-1C"}, // 7-Zip archive
