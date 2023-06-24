@@ -60,6 +60,8 @@ class Program
             Directory.CreateDirectory(outputPath);
         }
 
+// add else statement here to inform the user which directory is being used for the outputPath
+
         // Traverse the directory and check file signatures against the dictionary
         TraverseDirectory(dirPath, signatures, outputPath, extensions, ignoreCase);
     }
