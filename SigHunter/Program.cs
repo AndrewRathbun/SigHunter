@@ -20,8 +20,6 @@ class Program
         {
             switch (args[i])
             {
-                // ... option parsing code ...
-
                 case "-d":
                     // Get directory path
                     if (i + 1 < args.Length)
@@ -59,15 +57,17 @@ class Program
             Console.WriteLine($"Creating output directory {outputPath}");
             Directory.CreateDirectory(outputPath);
         }
-
-// add else statement here to inform the user which directory is being used for the outputPath
+        else
+        {
+            Console.WriteLine($"Using existing output directory {outputPath}");
+        }
 
         // Traverse the directory and check file signatures against the dictionary
         TraverseDirectory(dirPath, signatures, outputPath, extensions, ignoreCase);
     }
 
-    static void TraverseDirectory(string dirPath, Dictionary<string, string> signatures, string outputPath,
-        List<string> extensions, bool ignoreCase)
+    static void TraverseDirectory(string dirPath, Dictionary<List<string>, List<string>> signatures, string outputPath,
+            List<string> extensions, bool ignoreCase)
     {
         try
         {
@@ -95,7 +95,17 @@ class Program
                     }
                     else
                     {
-                        mismatchFiles.Add((result.Item1, result.Item2, result.Item3, result.Item5, signatures[result.Item2]));
+                        string expectedSignatures = string.Empty;
+                        foreach (var entry in signatures)
+                        {
+                            if (entry.Key.Contains(result.Item2))
+                            {
+                                expectedSignatures = string.Join(", ", entry.Value);
+                                break;
+                            }
+                        }
+
+                        mismatchFiles.Add((result.Item1, result.Item2, result.Item3, result.Item5, expectedSignatures));
                     }
 
                     if (index % 100 == 0)
@@ -122,7 +132,7 @@ class Program
         }
     }
 
-    static (string, string, string, bool, string) CheckFileSignature(string file, Dictionary<string, string> signatures, List<string> extensions, bool ignoreCase)
+    static (string file, string extension, string hexSignature, bool matched, string expectedExt) CheckFileSignature(string file, Dictionary<List<string>, List<string>> signatures, List<string> extensions, bool ignoreCase)
     {
         string extension = Path.GetExtension(file);
         string hexSignature = GetFileSignature(file);
@@ -132,21 +142,30 @@ class Program
             hexSignature = hexSignature.ToUpperInvariant();
         }
 
-        string expectedExt = signatures.FirstOrDefault(s => hexSignature.StartsWith(s.Value, StringComparison.OrdinalIgnoreCase)).Key;
+        string? expectedExt = signatures.FirstOrDefault(s => s.Key.Any(ext => extension.Equals(ext, StringComparison.OrdinalIgnoreCase)))
+                                              .Value.FirstOrDefault(expectedSignature => hexSignature.StartsWith(expectedSignature, StringComparison.OrdinalIgnoreCase));
 
-        bool matched = !string.IsNullOrEmpty(expectedExt) && string.Equals(expectedExt, extension, StringComparison.OrdinalIgnoreCase);
+        bool matched = !string.IsNullOrEmpty(expectedExt);
 
-        return (file, extension, hexSignature, matched, expectedExt);
+        return (file, extension, hexSignature, matched, expectedExt ?? string.Empty);
     }
 
     static string GetFileSignature(string filePath)
     {
-        byte[] buffer = new byte[8];
+        // Determine the longest magic number
+        int longestMagicNumber = FileSignatures.Signatures.Values
+            .Max(list => list.Max(s => s.Length)) / 2;  // We divide by 2 because each byte is represented by two hex characters
+
+        byte[] buffer = new byte[longestMagicNumber];
+
         using (FileStream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
         {
             stream.Read(buffer, 0, buffer.Length);
         }
-        return BitConverter.ToString(buffer);
+
+        // Convert bytes to hexadecimal and remove trailing zeros
+        string hexSignature = BitConverter.ToString(buffer).TrimEnd("-00".ToCharArray());
+        return hexSignature;
     }
 
     static void WriteToCsv(string csvFilePath, IEnumerable<string[]> data, string[] headers)
