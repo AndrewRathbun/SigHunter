@@ -22,7 +22,7 @@ public static class FileSignatures
         {".ogg", "4F-67-67-53"}, // Ogg Vorbis audio
         {".ra", "2E-72-61-FD"}, // RealAudio file
         {".wav", "52-49-46-46-57-41-56-45"}, // Waveform Audio File Format (WAV)
-        {".wma", "30-26-B2-75-8E-66-CF-11"} // Windows Media Audio
+        {".wma", "30-26-B2-75-8E-66-CF-11"}, // Windows Media Audio
 
         // Video files
         {".3g2", "66-74-79-70-33-67-32"}, // 3GPP2 multimedia file
@@ -40,7 +40,7 @@ public static class FileSignatures
         {".swf", "46-57-53"}, // Small Web Format (SWF) or Adobe Flash document
         {".vob", "00-00-01-BA"}, // Video Object (VOB)
         {".webm", "1A-45-DF-A3-93-42-82-88-68-74-74-70-73-3A-2F-2F"}, // WebM video
-        {".wmv", "30-26-B2-75-8E-66-CF-11"} // Windows Media Video
+        {".wmv", "30-26-B2-75-8E-66-CF-11"}, // Windows Media Video
         
         // Picture files
         {".bmp", "42-4D"}, // Bitmap image
