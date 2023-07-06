@@ -12,7 +12,7 @@ Using the [FileSignatures.cs](https://github.com/AndrewRathbun/SigHunter/blob/ma
 
 * `matched_files.csv` - files that match the file extension with the expected file signature
 * `mismatched_files.csv` - files that DO NOT match the file extension with the expected file signature
-* `unmatched_files.csv` - file that do not have a file extension entry in the tool's dictionary
+* `unmatched_files.csv` - files that do not have a file extension entry in the tool's dictionary
 
 ## Feedback
 
