@@ -2,6 +2,8 @@ public static class FileSignatures
 {
     public static Dictionary<List<string>, List<string>> Signatures { get; } = new Dictionary<List<string>, List<string>>
 {
+    // https://www.garykessler.net/library/file_sigs.html
+
     // Audio files
     { new List<string> { ".aac" }, new List<string> { "FF-F1" }}, // Advanced Audio Coding (AAC)
     { new List<string> { ".ac3" }, new List<string> { "0B-77" }}, // Audio Codec 3 (AC3)
@@ -37,7 +39,6 @@ public static class FileSignatures
     // Picture files
     { new List<string> { ".bmp" }, new List<string> { "42-4D" }}, // Bitmap image
     { new List<string> { ".gif" }, new List<string> { "47-49-46-38" }}, // Graphics Interchange Format (GIF)
-    { new List<string> { ".ico" }, new List<string> { "00-00-01-00" }}, // Icon format
     { new List<string> { ".jpeg", ".jpg" }, new List<string> { "FF-D8-FF-E0" }}, // JPEG image
     { new List<string> { ".png" }, new List<string> { "89-50-4E-47" }}, // Portable Network Graphics
     { new List<string> { ".psd" }, new List<string> { "38-42-50-53" }}, // Adobe Photoshop
