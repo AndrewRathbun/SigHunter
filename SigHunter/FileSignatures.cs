@@ -60,7 +60,6 @@ public static class FileSignatures
     { new List<string> { ".txt" }, new List<string> { "EF-BB-BF" }}, // Text file (UTF-8 BOM)
     { new List<string> { ".xls" }, new List<string> { "D0-CF-11-E0" }}, // Microsoft Excel (97-2003)
     { new List<string> { ".xlsx" }, new List<string> { "50-4B-03-04" }}, // Microsoft Excel (OpenXML)
-    { new List<string> { ".xml" }, new List<string> { "3C-3F-78-6D" }}, // XML document
 
     // Archive files
     { new List<string> { ".7z" }, new List<string> { "37-7A-BC-AF-27-1C" }}, // 7-Zip archive
@@ -84,17 +83,20 @@ public static class FileSignatures
     { new List<string> { ".json" }, new List<string> { "7B-0D" }}, // JavaScript Object Notation (JSON)
     { new List<string> { ".swf" }, new List<string> { "43-57-53" }}, // Adobe Flash
     { new List<string> { ".sqlite" }, new List<string> { "53-51-4C-69-74-65-20-66" }}, // SQLite
-    { new List<string> { ".xml" }, new List<string> { "3C-3F-78-6D-6C-20" }}, // XML document
+    { new List<string> { ".xml" }, new List<string> { "3C-3F-78-6D-6C-20", "3C-72-6F-6F-74-3E-3C" }}, // XML document
 
     // Windows OS files
+    { new List<string> { ".automaticDestinations-ms" }, new List<string> { "D0-CF-11-E0-A1-B1-1A-E1" }}, // JumpList - Automatic Destination
     { new List<string> { ".cab" }, new List<string> { "4D-53-43-46" }}, // Microsoft Cabinet file
     { new List<string> { ".cur" }, new List<string> { "00-00-02-00" }}, // Windows cursor
     { new List<string> { ".dll" }, new List<string> { "4D-5A-50-00", "4D-5A-90-00-03" }}, // Windows Dynamic Link Library
     { new List<string> { ".ese" }, new List<string> { "45-53-45-20-DD-01-04" }}, // Extensible Storage Engine (ESE) // EF-CD-AB-89-20-06 - possible values
+    { new List<string> { ".evtx" }, new List<string> { "45-6C-66-46-69-6C-65" }}, // Windows Event Log (Vista+)
     { new List<string> { ".exe" }, new List<string> { "4D-5A", "4D-5A-90-00-03" }}, // Windows executable
     { new List<string> { ".ico" }, new List<string> { "00-00-01-00" }}, // Windows icon
     { new List<string> { ".lnk" }, new List<string> { "4C-00-00-00-01-14-02-00" }}, // Windows shortcut
     { new List<string> { ".msi" }, new List<string> { "D0-CF-11-E0-A1-B1-1A-E1" }}, // Windows Installer
+    { new List<string> { ".pf" }, new List<string> { "4D-41-4D-04" }}, // Windows Prefetch file
     { new List<string> { ".sys" }, new List<string> { "4D-5A" }} // Windows system file
 };
 
