@@ -45,7 +45,7 @@ public static class FileSignatures
     { new List<string> { ".svg" }, new List<string> { "3C-3F-78-6D-6C" }}, // Scalable Vector Graphics (SVG) (starts with "<?xml")
     { new List<string> { ".tif" }, new List<string> { "4D-4D-00-2A" }}, // Tagged Image File Format (big endian)
     { new List<string> { ".tiff" }, new List<string> { "49-49-2A-00" }}, // Tagged Image File Format (little endian)
-    { new List<string> { ".webp" }, new List<string> { "52-49-46-46-XX-XX-XX-XX-57-45-42-50" }}, // WebP Image (XX's can be any value)
+    { new List<string> { ".webp" }, new List<string> { "52-49-46-46" }}, // WebP Image
 
     // Document files
     { new List<string> { ".doc" }, new List<string> { "D0-CF-11-E0" }}, // Microsoft Word (97-2003)
