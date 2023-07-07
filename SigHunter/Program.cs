@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.Collections.Concurrent;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 class Program
 {
@@ -29,6 +23,7 @@ class Program
                         dirPath = args[i + 1];
                         i++;
                     }
+
                     break;
 
                 case "-o":
@@ -38,6 +33,7 @@ class Program
                         outputPath = args[i + 1];
                         i++;
                     }
+
                     break;
 
                 default:
@@ -68,28 +64,32 @@ class Program
         TraverseDirectory(dirPath, signatures, outputPath, extensions, ignoreCase);
     }
 
-        static void TraverseDirectory(string dirPath, Dictionary<List<string>, List<string>> signatures, string outputPath,
+    static void TraverseDirectory(string dirPath, Dictionary<List<string>, List<string>> signatures, string outputPath,
         List<string> extensions, bool ignoreCase)
+    {
+        try
         {
-            try
-            {
             // Get all files in the directory and its subdirectories
-                string[] files = Directory.GetFiles(dirPath, "*", SearchOption.AllDirectories);
+            string[] files = Directory.GetFiles(dirPath, "*", SearchOption.AllDirectories);
+
+            // Convert extensions to lowercase for case-insensitive comparison
+            List<string> lowercaseExtensions = extensions.Select(ext => ext.ToLower()).ToList();
 
             // Filter by extensions if specified
-                if (extensions.Count > 0)
-                {
-                    files = files.Where(file => extensions.Contains(Path.GetExtension(file))).ToArray();
-                }
+            if (lowercaseExtensions.Count > 0)
+            {
+                files = files.Where(file => lowercaseExtensions.Contains(Path.GetExtension(file).ToLower())).ToArray();
+            }
 
             // Lists to store matched, mismatched, and unmatched files
-                ConcurrentBag<(string, string, string)> matchFiles = new ConcurrentBag<(string, string, string)>();
-                ConcurrentBag<(string, string, string, string, string)> mismatchFiles = new ConcurrentBag<(string, string, string, string, string)>();
-                ConcurrentBag<(string, string, string)> unmatchedFiles = new ConcurrentBag<(string, string, string)>();
+            ConcurrentBag<(string, string, string)> matchFiles = new ConcurrentBag<(string, string, string)>();
+            ConcurrentBag<(string, string, string, string, string)> mismatchFiles =
+                new ConcurrentBag<(string, string, string, string, string)>();
+            ConcurrentBag<(string, string, string)> unmatchedFiles = new ConcurrentBag<(string, string, string)>();
 
-                int processedFiles = 0; // Declare and initialize the 'processedFiles' variable
+            int processedFiles = 0; // Declare and initialize the 'processedFiles' variable
 
-            Parallel.ForEach(files, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, file =>
+            Parallel.ForEach(files, new ParallelOptions {MaxDegreeOfParallelism = Environment.ProcessorCount}, file =>
             {
                 try
                 {
@@ -102,8 +102,10 @@ class Program
                     {
                         if (result.recognizedExtension) // If the file extension was recognized
                         {
-                            string expectedSignatures = string.Join(", ", signatures.FirstOrDefault(s => s.Key.Contains(result.extension)).Value);
-                            mismatchFiles.Add((result.file, result.extension, result.hexSignature, result.expectedExt, expectedSignatures));
+                            string expectedSignatures = string.Join(", ",
+                                signatures.FirstOrDefault(s => s.Key.Contains(result.extension)).Value);
+                            mismatchFiles.Add((result.file, result.extension, result.hexSignature, result.expectedExt,
+                                expectedSignatures));
                         }
                         else
                         {
@@ -129,9 +131,19 @@ class Program
             });
 
             // Write matched, mismatched, and unmatched files to CSV
-            WriteToCsv(Path.Combine(outputPath, "matched_files.csv"), matchFiles.Select(x => new string[] { x.Item1, x.Item2, x.Item3 }), new[] { "Full File Path", "Current File Extension", "Current File Signature" });
-            WriteToCsv(Path.Combine(outputPath, "mismatched_files.csv"), mismatchFiles.Select(x => new string[] { x.Item1, x.Item2, x.Item3, x.Item4, x.Item5 }), new[] { "Full File Path", "Current File Extension", "Current File Signature", "Expected File Extension", "Expected File Signature" });
-            WriteToCsv(Path.Combine(outputPath, "unmatched_files.csv"), unmatchedFiles.Select(x => new string[] { x.Item1, x.Item2, x.Item3 }), new[] { "Full File Path", "Current File Extension", "Current File Signature" });
+            WriteToCsv(Path.Combine(outputPath, "matched_files.csv"),
+                matchFiles.Select(x => new string[] {x.Item1, x.Item2, x.Item3}),
+                new[] {"Full File Path", "Current File Extension", "Current File Signature"});
+            WriteToCsv(Path.Combine(outputPath, "mismatched_files.csv"),
+                mismatchFiles.Select(x => new string[] {x.Item1, x.Item2, x.Item3, x.Item4, x.Item5}),
+                new[]
+                {
+                    "Full File Path", "Current File Extension", "Current File Signature", "Expected File Extension",
+                    "Expected File Signature"
+                });
+            WriteToCsv(Path.Combine(outputPath, "unmatched_files.csv"),
+                unmatchedFiles.Select(x => new string[] {x.Item1, x.Item2, x.Item3}),
+                new[] {"Full File Path", "Current File Extension", "Current File Signature"});
 
             Console.WriteLine($"Matched files: {matchFiles.Count}");
             Console.WriteLine($"Mismatched files: {mismatchFiles.Count}");
@@ -143,10 +155,12 @@ class Program
         }
     }
 
-    static (string file, string extension, string hexSignature, bool matched, string expectedExt, bool recognizedExtension) CheckFileSignature(string file, Dictionary<List<string>, List<string>> signatures, List<string> extensions, bool ignoreCase)
+    static (string file, string extension, string hexSignature, bool matched, string expectedExt, bool
+        recognizedExtension) CheckFileSignature(string file, Dictionary<List<string>, List<string>> signatures,
+            List<string> extensions, bool ignoreCase)
     {
         // Get the file extension
-        string extension = Path.GetExtension(file);
+        string extension = Path.GetExtension(file)?.ToLowerInvariant();
 
         // Get the hexadecimal file signature
         string hexSignature = GetFileSignature(file);
@@ -164,13 +178,15 @@ class Program
         // Iterate over the signatures dictionary to find a matching extension and expected signature
         foreach (var entry in signatures)
         {
-            if (entry.Key.Contains(extension))
+            if (entry.Key.Any(ext => string.Equals(ext, extension,
+                    ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)))
             {
                 // Set recognizedExtension to true if the extension is found in the signatures dictionary
                 recognizedExtension = true;
 
                 // Find the expected signature that matches the file signature, ignoring case
-                expectedExt = entry.Value.FirstOrDefault(expectedSignature => hexSignature.StartsWith(expectedSignature, StringComparison.OrdinalIgnoreCase));
+                expectedExt = entry.Value.FirstOrDefault(expectedSignature => hexSignature.StartsWith(expectedSignature,
+                    ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal));
 
                 // Exit the loop once a matching extension is found
                 break;
@@ -188,7 +204,8 @@ class Program
     {
         // Determine the longest magic number by finding the maximum length among all signatures
         int longestMagicNumber = FileSignatures.Signatures.Values
-            .Max(list => list.Max(s => s.Length)) / 2;  // We divide by 2 because each byte is represented by two hex characters
+                                     .Max(list => list.Max(s => s.Length)) /
+                                 2; // We divide by 2 because each byte is represented by two hex characters
 
         // Create a byte buffer to hold the magic number
         byte[] buffer = new byte[longestMagicNumber];
