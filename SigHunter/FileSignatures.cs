@@ -91,10 +91,9 @@ public static class FileSignatures
     { new List<string> { ".automaticDestinations-ms" }, new List<string> { "D0-CF-11-E0-A1-B1-1A-E1" }}, // JumpList - Automatic Destination
     { new List<string> { ".cab" }, new List<string> { "4D-53-43-46" }}, // Microsoft Cabinet file
     { new List<string> { ".cur" }, new List<string> { "00-00-02-00" }}, // Windows cursor
-    { new List<string> { ".dll" }, new List<string> { "4D-5A-50-00", "4D-5A-90-00-03" }}, // Windows Dynamic Link Library
+    { new List<string> { ".dll", ".exe" }, new List<string> { "4D-5A-90-00-03" }}, // Windows Dynamic Link Library | Windows executable
     { new List<string> { ".ese" }, new List<string> { "45-53-45-20-DD-01-04" }}, // Extensible Storage Engine (ESE) // EF-CD-AB-89-20-06 - possible values
     { new List<string> { ".evtx" }, new List<string> { "45-6C-66-46-69-6C-65" }}, // Windows Event Log (Vista+)
-    { new List<string> { ".exe" }, new List<string> { "4D-5A", "4D-5A-90-00-03" }}, // Windows executable
     { new List<string> { ".ico" }, new List<string> { "00-00-01-00" }}, // Windows icon
     { new List<string> { ".lnk" }, new List<string> { "4C-00-00-00-01-14-02-00" }}, // Windows shortcut
     { new List<string> { ".msi" }, new List<string> { "D0-CF-11-E0-A1-B1-1A-E1" }}, // Windows Installer
