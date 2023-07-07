@@ -3,66 +3,103 @@ using System.Text;
 
 class Program
 {
-    static void Main(string[] args)
+static void Main(string[] args)
+{
+    var signatures = FileSignatures.Signatures;
+
+    // Get the directory path to traverse and output directory path from command-line arguments
+    string dirPath = "";
+    string outputPath = "";
+    List<string> extensions = new List<string>();
+    bool ignoreCase = false;
+    for (int i = 0; i < args.Length; i++)
     {
-        var signatures = FileSignatures.Signatures;
-
-        // Get the directory path to traverse and output directory path from command-line arguments
-        string dirPath = "";
-        string outputPath = "";
-        List<string> extensions = new List<string>();
-        bool ignoreCase = false;
-        for (int i = 0; i < args.Length; i++)
+        switch (args[i])
         {
-            switch (args[i])
-            {
-                case "-d":
-                    // Get directory path
-                    if (i + 1 < args.Length)
-                    {
-                        dirPath = args[i + 1];
-                        i++;
-                    }
-
-                    break;
-
-                case "-o":
-                    // Get output path
-                    if (i + 1 < args.Length)
-                    {
-                        outputPath = args[i + 1];
-                        i++;
-                    }
-
-                    break;
-
-                default:
-                    Console.WriteLine($"Error: Unrecognized option '{args[i]}'");
+            case "-d":
+                // Get directory path
+                if (i + 1 < args.Length)
+                {
+                    dirPath = args[i + 1];
+                    i++;
+                }
+                else
+                {
+                    Console.WriteLine("Error: Missing directory path after -d option");
                     return;
-            }
-        }
+                }
 
-        // Check that we have a directory and output path
-        if (string.IsNullOrEmpty(dirPath) || string.IsNullOrEmpty(outputPath))
-        {
-            Console.WriteLine("Error: Must specify directory path and output path");
-            return;
-        }
+                break;
 
-        // Check if the output directory exists, and create it if it doesn't
-        if (!Directory.Exists(outputPath))
+            case "-o":
+                // Get output path
+                if (i + 1 < args.Length)
+                {
+                    outputPath = args[i + 1];
+                    i++;
+                }
+                else
+                {
+                    Console.WriteLine("Error: Missing output path after -o option");
+                    return;
+                }
+
+                break;
+
+            default:
+                Console.WriteLine($"Error: Unrecognized option '{args[i]}'");
+                return;
+        }
+    }
+
+// Check that we have a directory and output path
+    if (string.IsNullOrEmpty(dirPath) || string.IsNullOrEmpty(outputPath))
+    {
+        Console.WriteLine("Error: Must specify directory path (-d) and output path (-o). Example: .\\SigHunter.exe -d C:\\Folder\\To\\Be\\Scanned -o C:\\temp\\Output\\Folder");
+        return;
+    }
+
+// Validate and normalize directory path
+    string directoryPath = Path.GetFullPath(dirPath);
+    if (!Directory.Exists(directoryPath))
+    {
+        if (File.Exists(directoryPath))
         {
-            Console.WriteLine($"Creating output directory {outputPath}");
-            Directory.CreateDirectory(outputPath);
+            Console.WriteLine($"Error: Invalid directory path (-d) '{directoryPath}'. Please specify a directory path instead of a file path.");
         }
         else
         {
-            Console.WriteLine($"Using existing output directory {outputPath}");
+            Console.WriteLine($"Error: Directory path '{directoryPath}' does not exist.");
         }
-
-        // Traverse the directory and check file signatures against the dictionary
-        TraverseDirectory(dirPath, signatures, outputPath, extensions, ignoreCase);
+        return;
     }
+    else
+    {
+        Console.WriteLine($"Scanning {directoryPath}");
+    }
+
+// Validate and normalize output path
+    string outputDirectoryPath = Path.GetFullPath(outputPath);
+    if (!Directory.Exists(outputDirectoryPath))
+    {
+        if (File.Exists(outputDirectoryPath))
+        {
+            Console.WriteLine($"Error: Invalid output path (-o) '{outputDirectoryPath}'. Please specify a directory path instead of a file path.");
+        }
+        else
+        {
+            Console.WriteLine($"Creating output directory: {outputDirectoryPath}");
+            Directory.CreateDirectory(outputDirectoryPath);
+        }
+    }
+    else
+    {
+        Console.WriteLine($"Using existing output directory: {outputDirectoryPath}");
+    }
+
+    // Traverse the directory and check file signatures against the dictionary
+    TraverseDirectory(dirPath, signatures, outputPath, extensions, ignoreCase);
+}
 
     static void TraverseDirectory(string dirPath, Dictionary<List<string>, List<string>> signatures, string outputPath,
         List<string> extensions, bool ignoreCase)
