@@ -1,132 +1,97 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 class Program
 {
-static void Main(string[] args)
-{
-    var signatures = FileSignatures.Signatures;
-
-    // Get the directory path to traverse and output directory path from command-line arguments
-    string dirPath = "";
-    string outputPath = "";
-    List<string> extensions = new List<string>();
-    bool ignoreCase = false;
-    for (int i = 0; i < args.Length; i++)
+    static void Main(string[] args)
     {
-        switch (args[i])
+        // Get the directory path to traverse and output directory path from command-line arguments
+        string dirPath = "";
+        string outputPath = "";
+
+        for (int i = 0; i < args.Length; i++)
         {
-            case "-d":
-                // Get directory path
-                if (i + 1 < args.Length)
-                {
-                    dirPath = args[i + 1];
-                    i++;
-                }
-                else
-                {
-                    Console.WriteLine("Error: Missing directory path after -d option");
+            switch (args[i])
+            {
+                case "-d":
+                    // Get directory path
+                    if (i + 1 < args.Length)
+                    {
+                        dirPath = args[i + 1];
+                        i++;
+                    }
+                    break;
+
+                case "-o":
+                    // Get output path
+                    if (i + 1 < args.Length)
+                    {
+                        outputPath = args[i + 1];
+                        i++;
+                    }
+                    break;
+
+                default:
+                    Console.WriteLine($"Error: Unrecognized option '{args[i]}'");
                     return;
-                }
-
-                break;
-
-            case "-o":
-                // Get output path
-                if (i + 1 < args.Length)
-                {
-                    outputPath = args[i + 1];
-                    i++;
-                }
-                else
-                {
-                    Console.WriteLine("Error: Missing output path after -o option");
-                    return;
-                }
-
-                break;
-
-            default:
-                Console.WriteLine($"Error: Unrecognized option '{args[i]}'");
-                return;
+            }
         }
-    }
 
-// Check that we have a directory and output path
-    if (string.IsNullOrEmpty(dirPath) || string.IsNullOrEmpty(outputPath))
-    {
-        Console.WriteLine("Error: Must specify directory path (-d) and output path (-o). Example: .\\SigHunter.exe -d C:\\Folder\\To\\Be\\Scanned -o C:\\temp\\Output\\Folder");
-        return;
-    }
-
-// Validate and normalize directory path
-    string directoryPath = Path.GetFullPath(dirPath);
-    if (!Directory.Exists(directoryPath))
-    {
-        if (File.Exists(directoryPath))
+        // Check that we have a directory and output path
+        if (string.IsNullOrEmpty(dirPath) || string.IsNullOrEmpty(outputPath))
         {
-            Console.WriteLine($"Error: Invalid directory path (-d) '{directoryPath}'. Please specify a directory path instead of a file path.");
+            Console.WriteLine("Error: Must specify directory path and output path");
+            return;
+        }
+
+        // Check if the output directory exists, and create it if it doesn't
+        if (!Directory.Exists(outputPath))
+        {
+            Console.WriteLine($"Creating output directory {outputPath}");
+            Directory.CreateDirectory(outputPath);
         }
         else
         {
-            Console.WriteLine($"Error: Directory path '{directoryPath}' does not exist.");
+            Console.WriteLine($"Using existing output directory {outputPath}");
         }
-        return;
-    }
-    else
-    {
-        Console.WriteLine($"Scanning {directoryPath}");
+
+        // Traverse the directory and check file signatures against the dictionary
+        TraverseDirectory(dirPath, outputPath);
     }
 
-// Validate and normalize output path
-    string outputDirectoryPath = Path.GetFullPath(outputPath);
-    if (!Directory.Exists(outputDirectoryPath))
+    static void TraverseDirectory(string dirPath, string outputPath)
     {
-        if (File.Exists(outputDirectoryPath))
-        {
-            Console.WriteLine($"Error: Invalid output path (-o) '{outputDirectoryPath}'. Please specify a directory path instead of a file path.");
-        }
-        else
-        {
-            Console.WriteLine($"Creating output directory: {outputDirectoryPath}");
-            Directory.CreateDirectory(outputDirectoryPath);
-        }
-    }
-    else
-    {
-        Console.WriteLine($"Using existing output directory: {outputDirectoryPath}");
-    }
+        bool ignoreCase = false;
+        List<string> extensions = new List<string>();
+        var signatures = FileSignatures.Signatures;
 
-    // Traverse the directory and check file signatures against the dictionary
-    TraverseDirectory(dirPath, signatures, outputPath, extensions, ignoreCase);
-}
-
-    static void TraverseDirectory(string dirPath, Dictionary<List<string>, List<string>> signatures, string outputPath,
-        List<string> extensions, bool ignoreCase)
-    {
         try
         {
             // Get all files in the directory and its subdirectories
             string[] files = Directory.GetFiles(dirPath, "*", SearchOption.AllDirectories);
-
-            // Convert extensions to lowercase for case-insensitive comparison
-            List<string> lowercaseExtensions = extensions.Select(ext => ext.ToLower()).ToList();
+            int numberOfFiles = files.Length;
 
             // Filter by extensions if specified
-            if (lowercaseExtensions.Count > 0)
+            if (extensions.Count > 0)
             {
-                files = files.Where(file => lowercaseExtensions.Contains(Path.GetExtension(file).ToLower())).ToArray();
+                files = files.Where(file => extensions.Contains(Path.GetExtension(file))).ToArray();
             }
 
             // Lists to store matched, mismatched, and unmatched files
-            ConcurrentBag<(string, string, string)> matchFiles = new ConcurrentBag<(string, string, string)>();
-            ConcurrentBag<(string, string, string, string, string)> mismatchFiles =
-                new ConcurrentBag<(string, string, string, string, string)>();
-            ConcurrentBag<(string, string, string)> unmatchedFiles = new ConcurrentBag<(string, string, string)>();
+            ConcurrentBag<(string, string, string)> matchFiles = new();
+            ConcurrentBag<(string, string, string, string, string)> mismatchFiles = new();
+            ConcurrentBag<(string, string, string)> unmatchedFiles = new();
 
             int processedFiles = 0; // Declare and initialize the 'processedFiles' variable
+            int progressBarWidth = Console.WindowWidth - 2;
 
-            Parallel.ForEach(files, new ParallelOptions {MaxDegreeOfParallelism = Environment.ProcessorCount}, file =>
+            Parallel.ForEach(files, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, file =>
             {
                 try
                 {
@@ -139,10 +104,8 @@ static void Main(string[] args)
                     {
                         if (result.recognizedExtension) // If the file extension was recognized
                         {
-                            string expectedSignatures = string.Join(", ",
-                                signatures.FirstOrDefault(s => s.Key.Contains(result.extension)).Value);
-                            mismatchFiles.Add((result.file, result.extension, result.hexSignature, result.expectedExt,
-                                expectedSignatures));
+                            string expectedSignatures = string.Join(", ", signatures.FirstOrDefault(s => s.Key.Contains(result.extension)).Value);
+                            mismatchFiles.Add((result.file, result.extension, result.hexSignature, result.expectedExt, expectedSignatures));
                         }
                         else
                         {
@@ -151,9 +114,18 @@ static void Main(string[] args)
                     }
 
                     int processed = Interlocked.Increment(ref processedFiles);
-                    if (processed % 100 == 0)
+
+                    // Update progress bar
+                    if (processed % 100 == 0 || processed == numberOfFiles)
                     {
-                        Console.WriteLine($"{processed} files processed...");
+                        double progressPercentage = (double)processed / numberOfFiles;
+                        int progressBarLength = (int)(progressPercentage * progressBarWidth);
+                        string progressBar = "[" + new string('#', progressBarLength) +
+                                              new string(' ', progressBarWidth - progressBarLength) + "]";
+
+                        Console.Clear();
+                        Console.WriteLine("Progress: {0}%", (int)(progressPercentage * 100));
+                        Console.WriteLine(progressBar);
                     }
                 }
                 catch (UnauthorizedAccessException e)
@@ -164,23 +136,14 @@ static void Main(string[] args)
                 catch (Exception e)
                 {
                     Console.WriteLine($"Error processing file {file}: {e.Message}");
+                    Console.WriteLine($"Full error:{e}");
                 }
             });
 
             // Write matched, mismatched, and unmatched files to CSV
-            WriteToCsv(Path.Combine(outputPath, "matched_files.csv"),
-                matchFiles.Select(x => new string[] {x.Item1, x.Item2, x.Item3}),
-                new[] {"Full File Path", "Current File Extension", "Current File Signature"});
-            WriteToCsv(Path.Combine(outputPath, "mismatched_files.csv"),
-                mismatchFiles.Select(x => new string[] {x.Item1, x.Item2, x.Item3, x.Item4, x.Item5}),
-                new[]
-                {
-                    "Full File Path", "Current File Extension", "Current File Signature", "Expected File Extension",
-                    "Expected File Signature"
-                });
-            WriteToCsv(Path.Combine(outputPath, "unmatched_files.csv"),
-                unmatchedFiles.Select(x => new string[] {x.Item1, x.Item2, x.Item3}),
-                new[] {"Full File Path", "Current File Extension", "Current File Signature"});
+            WriteToCsv(Path.Combine(outputPath, "matched_files.csv"), matchFiles.Select(x => new string[] { x.Item1, x.Item2, x.Item3 }), new[] { "Full File Path", "Current File Extension", "Current File Signature" });
+            WriteToCsv(Path.Combine(outputPath, "mismatched_files.csv"), mismatchFiles.Select(x => new string[] { x.Item1, x.Item2, x.Item3, x.Item4, x.Item5 }), new[] { "Full File Path", "Current File Extension", "Current File Signature", "Expected File Extension", "Expected File Signature" });
+            WriteToCsv(Path.Combine(outputPath, "unmatched_files.csv"), unmatchedFiles.Select(x => new string[] { x.Item1, x.Item2, x.Item3 }), new[] { "Full File Path", "Current File Extension", "Current File Signature" });
 
             Console.WriteLine($"Matched files: {matchFiles.Count}");
             Console.WriteLine($"Mismatched files: {mismatchFiles.Count}");
@@ -192,12 +155,10 @@ static void Main(string[] args)
         }
     }
 
-    static (string file, string extension, string hexSignature, bool matched, string expectedExt, bool
-        recognizedExtension) CheckFileSignature(string file, Dictionary<List<string>, List<string>> signatures,
-            List<string> extensions, bool ignoreCase)
+    static (string file, string extension, string hexSignature, bool matched, string expectedExt, bool recognizedExtension) CheckFileSignature(string file, Dictionary<List<string>, List<string>> signatures, List<string> extensions, bool ignoreCase)
     {
         // Get the file extension
-        string extension = Path.GetExtension(file)?.ToLowerInvariant();
+        string extension = Path.GetExtension(file);
 
         // Get the hexadecimal file signature
         string hexSignature = GetFileSignature(file);
@@ -215,15 +176,13 @@ static void Main(string[] args)
         // Iterate over the signatures dictionary to find a matching extension and expected signature
         foreach (var entry in signatures)
         {
-            if (entry.Key.Any(ext => string.Equals(ext, extension,
-                    ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)))
+            if (entry.Key.Contains(extension))
             {
                 // Set recognizedExtension to true if the extension is found in the signatures dictionary
                 recognizedExtension = true;
 
                 // Find the expected signature that matches the file signature, ignoring case
-                expectedExt = entry.Value.FirstOrDefault(expectedSignature => hexSignature.StartsWith(expectedSignature,
-                    ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal));
+                expectedExt = entry.Value.FirstOrDefault(expectedSignature => hexSignature.StartsWith(expectedSignature, StringComparison.OrdinalIgnoreCase));
 
                 // Exit the loop once a matching extension is found
                 break;
@@ -236,13 +195,11 @@ static void Main(string[] args)
         // Return the tuple containing file information and matching status
         return (file, extension, hexSignature, matched, expectedExt ?? string.Empty, recognizedExtension);
     }
-
     static string GetFileSignature(string filePath)
     {
         // Determine the longest magic number by finding the maximum length among all signatures
         int longestMagicNumber = FileSignatures.Signatures.Values
-                                     .Max(list => list.Max(s => s.Length)) /
-                                 2; // We divide by 2 because each byte is represented by two hex characters
+            .Max(list => list.Max(s => s.Length)) / 2;  // We divide by 2 because each byte is represented by two hex characters
 
         // Create a byte buffer to hold the magic number
         byte[] buffer = new byte[longestMagicNumber];
