@@ -72,7 +72,7 @@ public static class FileSignatures
     { new List<string> { ".jar" }, new List<string> { "50-4B-03-04" }}, // Java Archive (JAR)
     { new List<string> { ".lzh" }, new List<string> { "49-45-4C-01" }}, // LZH compressed file
     { new List<string> { ".lzw" }, new List<string> { "5A-57-53-31" }}, // Lempel-Ziv-Welch (LZW) compressed file
-    { new List<string> { ".rar" }, new List<string> { "52-61-72-21-1A-07-00", "52-61-72-21-1A-07-01-00" }}, // RAR archive v1.50 onwards
+    { new List<string> { ".rar" }, new List<string> { "52-61-72-21-1A-07-00", "52-61-72-21-1A-07-01-00" }}, // RAR archive v1.50 onwards | RAR archive v5.0 onwards
     { new List<string> { ".tar" }, new List<string> { "75-73-74-61-72-00-30-30", "75-73-74-61-72-20-20-00" }}, // tar archive
     { new List<string> { ".xz" }, new List<string> { "FD-37-7A-58-5A-00" }}, // XZ archive
     { new List<string> { ".zip" }, new List<string> { "50-4B-03-04" }}, // ZIP archive
